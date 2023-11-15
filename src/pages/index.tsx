@@ -1,3 +1,5 @@
+import { SignedOut } from "@clerk/clerk-react";
+import { SignInButton, SignedIn, UserButton, useAuth, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Link from "next/link";
 
@@ -5,7 +7,8 @@ import { api } from "~/utils/api";
 
 export default function Home() {
     const hello = api.post.hello.useQuery({ text: "from tRPC" });
-    const { data: user } = api.user.getById.useQuery(1)
+    const { user: clerkUser } = useUser();
+    const { data: user } = api.user.getById.useQuery(clerkUser?.id ?? "", { enabled: !!clerkUser?.id })
 
     return (
         <>
@@ -17,7 +20,7 @@ export default function Home() {
             <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
                 <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
                     <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-                        Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
+                        Create <div className="text-[hsl(280,100%,70%)]">T3</div> App
                     </h1>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
                         <Link
@@ -46,9 +49,26 @@ export default function Home() {
                     <p className="text-2xl text-white">
                         {hello.data ? hello.data.greeting : "Loading tRPC query..."}
                     </p>
-                    <p className="text-2xl text-white">
-                        {user ? `Got user of id ${user.id} with role ${user.role}` : "Getting user..."}
-                    </p>
+                    <div>
+                        <SignedIn>
+                            <div className="flex justify-center items-center gap-2 mb-4 text-white">
+                                <p>{"click me ->"}</p>
+                                <UserButton afterSignOutUrl="/" />
+                                <div>
+                                    <p className="text-2xl font-semibold">{clerkUser?.fullName}</p>
+                                    <p>{clerkUser?.username}</p>
+                                </div>
+                            </div>
+                            <p className="text-2xl text-white whitespace-pre-line text-center">
+                                {user ? `Found you! Is this your ID?\n${user.id}` : "Getting you from the database..."}
+                            </p>
+                        </SignedIn>
+                        <SignedOut>
+                            <SignInButton>
+                                <button className="px-3 py-2 font-bold bg-primary rounded-xl">Sign In</button>
+                            </SignInButton>
+                        </SignedOut>
+                    </div>
                 </div>
             </main>
         </>

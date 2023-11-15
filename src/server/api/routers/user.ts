@@ -4,7 +4,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 const getById = publicProcedure
-    .input(z.number())
+    .input(z.string())
     .query(async ({ input: userId, ctx }) => {
         const user = await ctx.prisma.user.findUnique({
             where: {

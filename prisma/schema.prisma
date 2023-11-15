@@ -14,7 +14,7 @@ enum Role  {
 }
 
 model User {
-    id Int @id @default(autoincrement())
+    id String @id
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now())
     role Role @default(USER)
@@ -28,9 +28,9 @@ model Rating {
     id Int @id @default(autoincrement())
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now())
-    authorId Int
+    authorId String
     author User @relation("AuthoredRatings", fields: [authorId], references: [id])
-    ratedUserId Int
+    ratedUserId String
     ratedUser User @relation("Ratings", fields: [ratedUserId], references: [id])
     stars Int
     comment String @db.Text
