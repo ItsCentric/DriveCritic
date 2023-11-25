@@ -12,6 +12,8 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db as prisma } from "~/server/db";
+import { getAuth, SignedInAuthObject, SignedOutAuthObject } from '@clerk/nextjs/server';
+import * as trpcNext from '@trpc/server/adapters/next';
 
 /**
  * 1. CONTEXT
@@ -21,15 +23,26 @@ import { db as prisma } from "~/server/db";
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 
+interface AuthContext {
+  auth: SignedInAuthObject | SignedOutAuthObject;
+}
+ 
+export const createContextInner = async ({ auth }: AuthContext  ) => {
+  return {
+    auth,
+  }
+}
+
 /**
  * This is the actual context you will use in your router. It will be used to process every request
  * that goes through your tRPC endpoint.
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (_opts: CreateNextContextOptions) => {
+export const createTRPCContext = async (_opts: trpcNext.CreateNextContextOptions) => {
     return {
-        prisma
+        prisma: prisma,
+        auth: await createContextInner({ auth: getAuth(_opts.req) }),
     }
 };
 
