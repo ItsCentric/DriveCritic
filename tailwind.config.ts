@@ -22,5 +22,6 @@ export default {
   },
   plugins: [
     require("@tailwindcss/forms"),
+    require("daisyui"),
   ],
 } satisfies Config;

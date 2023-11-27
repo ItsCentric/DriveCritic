@@ -8,11 +8,9 @@
  */
 
 import { initTRPC } from "@trpc/server";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db as prisma } from "~/server/db";
-import { getAuth, SignedInAuthObject, SignedOutAuthObject } from '@clerk/nextjs/server';
 import * as trpcNext from '@trpc/server/adapters/next';
 
 /**
@@ -23,15 +21,15 @@ import * as trpcNext from '@trpc/server/adapters/next';
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 
-interface AuthContext {
-  auth: SignedInAuthObject | SignedOutAuthObject;
-}
- 
-export const createContextInner = async ({ auth }: AuthContext  ) => {
-  return {
-    auth,
-  }
-}
+// interface AuthContext {
+//   auth: SignedInAuthObject | SignedOutAuthObject;
+// }
+//
+// export const createContextInner = async ({ auth }: AuthContext) => {
+//   return {
+//     auth,
+//   };
+// };
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -39,11 +37,11 @@ export const createContextInner = async ({ auth }: AuthContext  ) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = async (_opts: trpcNext.CreateNextContextOptions) => {
-    return {
-        prisma: prisma,
-        auth: await createContextInner({ auth: getAuth(_opts.req) }),
-    }
+export const createTRPCContext = (_opts: trpcNext.CreateNextContextOptions) => {
+  return {
+    prisma: prisma,
+    // auth: await createContextInner({ auth: getAuth(_opts.req) }),
+  };
 };
 
 /**
@@ -54,19 +52,21 @@ export const createTRPCContext = async (_opts: trpcNext.CreateNextContextOptions
  * errors on the backend.
  */
 
-const t = initTRPC.context<typeof createTRPCContext>().create({
-  transformer: superjson,
-  errorFormatter({ shape, error }) {
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
-      },
-    };
-  },
-});
+const t = initTRPC
+  .context<typeof createTRPCContext | { prisma: typeof prisma }>()
+  .create({
+    transformer: superjson,
+    errorFormatter({ shape, error }) {
+      return {
+        ...shape,
+        data: {
+          ...shape.data,
+          zodError:
+            error.cause instanceof ZodError ? error.cause.flatten() : null,
+        },
+      };
+    },
+  });
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)

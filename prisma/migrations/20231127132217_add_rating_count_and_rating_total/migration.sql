@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "ratingCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "ratingTotal" INTEGER NOT NULL DEFAULT 0;
