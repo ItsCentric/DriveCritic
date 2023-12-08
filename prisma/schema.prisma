@@ -21,7 +21,7 @@ model User {
     role Role @default(USER)
     ratings Rating[] @relation("Ratings")
     ratingCount Int @default(0)
-    ratingTotal Int @default(0)
+    ratingTotalScore Int @default(0)
     authoredRatings Rating[] @relation("AuthoredRatings")
 
     @@map("users")
