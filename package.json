@@ -2,11 +2,21 @@
   "name": "drive-critic",
   "version": "0.1.0",
   "private": true,
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --quiet --fix"
+    ],
+    "*.{json,html}": [
+      "prettier --write --ignore-unknown"
+    ]
+  },
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@t3-oss/env-nextjs": "^0.7.0",
@@ -31,8 +41,11 @@
     "autoprefixer": "^10.4.14",
     "eslint": "^8.47.0",
     "eslint-config-next": "^14.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.0",
     "postcss": "^8.4.27",
-    "prettier": "^3.1.0",
+    "prettier": "^3.1.1",
     "prettier-plugin-tailwindcss": "^0.5.7",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.1.6"
